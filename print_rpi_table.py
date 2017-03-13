@@ -1,27 +1,28 @@
 #!/usr/bin/python
 
-import boto.dynamodb2
-from boto.dynamodb2.fields import HashKey, RangeKey, KeysOnlyIndex, GlobalAllIndex
-from boto.dynamodb2.table import Table
-from boto.dynamodb2.types import NUMBER
+import json
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
+
+dynamodb = boto3.resource('dynamodb')
 
 ## Query DB and get all the teams
 def getTeams():
   season=2017
-  t = Table('nepreprpiteams')
-  teams = t.query_2(season__eq=season,
-                   index='season-name-index',
+  t = dynamodb.Table('nepreprpiteams')
+  teams = t.query(KeyConditionExpression=Key('season').eq(season),
+                   IndexName='season-name-index',
   )
 
-  return teams
+  return teams['Items']
 
 ## Query DB and get all the games
 def getGames():
   season=2017
-  g = Table('nepreprpiboys')
-  games = g.query_2(season__eq=season)
+  g = dynamodb.Table('nepreprpiboys')
+  games = g.query(KeyConditionExpression=Key('season').eq(season))
 
-  return games
+  return games['Items']
 
 ## Loop through the games and calculate the wins and losses
 def getRecords(games):
@@ -29,12 +30,10 @@ def getRecords(games):
   for game in games:
     # Set the wins and losses to 0
     if game['winner'] not in record:
-      print "Winner = "+game['winner']
       record[game['winner']] = {}
       record[game['winner']]['win'] = 0
       record[game['winner']]['loss'] = 0
     if game['loser'] not in record:
-      print "Loser = "+game['loser']
       record[game['loser']] = {}
       record[game['loser']]['win'] = 0
       record[game['loser']]['loss'] = 0
@@ -52,14 +51,27 @@ def printRpiTableHandler (event, context):
 
   teams = getTeams()
 
-  print "<table>\n<tr><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th></tr>\n"
-  for team in teams:
-    print "<tr><td>"+team['name']+"</td>"
-    print "<td>"+str(record[team['name']]['win'])+"</td>"
-    print "<td>"+str(record[team['name']]['loss'])+"</td>"
-    winpct = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
-    print "<td>%0.2f" % winpct
-    print "</td>"
-    print "</tr>\n"
+def printRpiTableHandler (event, context):
 
-  print "</table>\n"
+  games = getGames()
+
+  record = getRecords(games)
+
+  teams = getTeams()
+
+  content = "<html><body>\n"
+  content += "<table>\n<tr><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th></tr>\n"
+  for team in teams:
+    content += "<tr><td>"+team['name']+"</td>"
+    content += "<td>"+str(record[team['name']]['win'])+"</td>"
+    content += "<td>"+str(record[team['name']]['loss'])+"</td>"
+    winpct = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
+    content += "<td>%0.2f" % winpct
+    content += "</td>"
+    content += "</tr>\n"
+
+  content += "</table>\n</body></html>"
+  print content
+  return content
+
+printRpiTableHandler("HTTP","Something")
