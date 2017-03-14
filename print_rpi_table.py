@@ -1,11 +1,15 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 from __future__ import division
+
 import json
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
 dynamodb = boto3.resource('dynamodb')
+
+print('Loading function')
 
 ## Query DB and get all the teams
 def getTeams():
@@ -45,7 +49,7 @@ def getRecords(games,teams):
   # calculate winpct
   for team in teams:
     record[team['name']]['winpct'] = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
-
+    
   return record
 
 def getOwpct(games,record,team):
@@ -82,20 +86,20 @@ def getOOwpct(games,record,team):
 
 def printRpiTableHandler (event, context):
 
+  # Get all game results
   games = getGames()
-
-  record = getRecords(games)
-
+  
+  # Get all team names
   teams = getTeams()
+  
+  # build record entries
+  record = getRecords(games,teams)
 
-  content = "<html><body>\n"
-  content += "<table>\n<tr><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th></tr>\n"
+  content = '<html><body><table width="60%"><caption>New England Preps Lacrosse RPI</caption><tr><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th></tr>'
   for team in teams:
-    content += "<tr><td>"+team['name']+"</td>"
-    content += "<td>"+str(record[team['name']]['win'])+"</td>"
-    content += "<td>"+str(record[team['name']]['loss'])+"</td>"
-    content += "<td>%0.2f" % record[team['name']]['winpct']
-    content += "</td>"
+    content += '<tr><td><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?team='+team['name']+'">'+team['name']+'</a></td>'
+    content += '<td>'+str(record[team['name']]['win'])+'</td>'
+    content += '<td>'+str(record[team['name']]['loss'])+'</td>'
     owpct = getOwpct(games,record,team['name'])
     content += "<td>%0.2f" % owpct
     content += "</td>"
@@ -104,8 +108,7 @@ def printRpiTableHandler (event, context):
     content += "</td>"
     content += "</tr>\n"
 
-  content += "</table>\n</body></html>"
-  print content
+  content += '</table></body></html>'
   return content
 
-printRpiTableHandler("HTTP","Something")
+
