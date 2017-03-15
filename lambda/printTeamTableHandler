@@ -40,7 +40,7 @@ def printTeamTableHandler(event, context):
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
   content = "<html><head>"+css+"</head><body><table width=\"60%\"><caption>"+team+" Results</caption>\n<tr><th>Team</th><th>Score</th><th>Opponent</th></th><th>Score</th><th>Date</th></tr>\n"
   print(teams)
-  for game in sorted(games.iteritems(), key=lambda (x, y): y['date'], reverse=True):
+  for game in sorted(games, key=lambda k: k['date'], reverse=True):
     if team == game['winner'] or team == game['loser']:
       content += '<tr><td><a href="'+teams[game['winner']]['url']+'">'+game['winner']+'</td><td>'+str(game['scores']['winner'])+'</td><td><a href="'+teams[game['loser']]['url']+'">'+game['loser']+'</td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
 

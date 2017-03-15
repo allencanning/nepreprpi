@@ -1,3 +1,7 @@
+table {
+  width: 80%;
+}
+
 table, th, td {
   border: 1px solid #D2D3D5;
   border-collapse: collapse;
@@ -6,7 +10,7 @@ th, td {
   text-align: center;
 }
 th {
-  background-color: #3386FF;
+  background-color: #666666;
   color: white;
 }
 tr:hover {
