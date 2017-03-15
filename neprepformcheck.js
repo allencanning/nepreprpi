@@ -15,8 +15,6 @@ function formCheck() {
   var year = document.forms['process']['year'].value;
   var msg = "";
 
-  alert("Entering javascript\nws = "+ws+"\nls = "+ls+"ws type = "+typeof(ws));
-
   if (winner == "" || loser == "") {
     msg = "You must select a team";
   }

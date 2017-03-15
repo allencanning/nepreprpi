@@ -1,0 +1,123 @@
+from __future__ import print_function
+from __future__ import division
+
+import json
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
+
+dynamodb = boto3.resource('dynamodb')
+
+print('Loading function')
+
+## Query DB and get all the teams
+def getTeams():
+  season=2017
+  t = dynamodb.Table('nepreprpiteams')
+  teams = t.query(KeyConditionExpression=Key('season').eq(season),
+                   IndexName='season-name-index',
+  )
+
+  return teams['Items']
+
+## Query DB and get all the games
+def getGames():
+  season=2017
+  g = dynamodb.Table('nepreprpiboys')
+  games = g.query(KeyConditionExpression=Key('season').eq(season))
+
+  return games['Items']
+
+## Loop through the games and calculate the wins and losses
+def getRecords(games,teams):
+  record = {}
+  for game in games:
+    # Set the wins and losses to 0
+    if game['winner'] not in record:
+      record[game['winner']] = {}
+      record[game['winner']]['win'] = 0
+      record[game['winner']]['loss'] = 0
+    if game['loser'] not in record:
+      record[game['loser']] = {}
+      record[game['loser']]['win'] = 0
+      record[game['loser']]['loss'] = 0
+
+    record[game['winner']]['win'] += 1
+    record[game['loser']]['loss'] += 1
+
+  # calculate winpct
+  for team in teams:
+    record[team['name']]['winpct'] = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
+    print(team['name']+" "+str(record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])))
+    
+  return record
+
+def getOwpct(games,record,team):
+  numteams = 0
+  owpct = 0
+  for g in games:
+    if team != g['winner']:
+      numteams += 1
+      owpct += record[g['winner']]['winpct']
+    if team != g['loser']:
+      numteams += 1
+      owpct += record[g['loser']]['winpct']
+
+  owpctavg = owpct / numteams
+  
+  return owpctavg
+
+def getOOwpct(games,record,team):
+  numteams = 0
+  oowpct = 0
+  for g in games:
+    if team != g['winner']:
+      numteams += 1
+      owpct = getOwpct(games,record,g['winner'])
+      oowpct += owpct
+    if team != g['loser']:
+      numteams += 1
+      owpct = getOwpct(games,record,g['loser'])
+      oowpct += owpct
+
+  oowpctavg = oowpct / numteams
+
+  return oowpctavg
+
+def printRpiTableHandler (event, context):
+
+  # Get all game results
+  games = getGames()
+  
+  # Get all team names
+  teams = getTeams()
+  
+  # build record entries
+  record = getRecords(games,teams)
+  for team in teams:
+      owpct = getOwpct(games,record,team['name'])
+      record[team['name']]['owpct'] = owpct
+      oowpct = getOOwpct(games,record,team)
+      record[team['name']]['oowpct'] = oowpct
+      record[team['name']]['rpi'] = (record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
+      
+  css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
+  content = '<html><head>'+css+'</head><body><table border="1" width="60%"><caption>New England Preps Lacrosse RPI Rankings</caption><tr><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
+  for team in sorted(record.iteritems(), key=lambda (x, y): y['rpi'], reverse=True):
+    content += '<tr><td><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?team='+team[0]+'">'+team[0]+'</a></td>'
+    content += '<td>'+str(record[team[0]]['win'])+'</td>'
+    content += '<td>'+str(record[team[0]]['loss'])+'</td>'
+    content += "<td>%0.2f" % record[team[0]]['winpct']
+    owpct = getOwpct(games,record,team[0])
+    content += "<td>%0.2f" % owpct
+    content += "</td>"
+    oowpct = getOOwpct(games,record,team)
+    content += "<td>%0.2f" % oowpct
+    content += "</td>"
+    rpi = (record[team[0]]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
+    content += "<td>%0.2f" % rpi
+    content += "</td>"
+    content += "</tr>\n"
+
+  content += '</table></body></html>'
+  return content
+
