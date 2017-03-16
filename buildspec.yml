@@ -3,13 +3,13 @@ version: 0.1
 phases:
   install:
     commands:
-      - aws cloudformation package --template-file printRpiTableHandler.yaml --s3-bucket nepreprpi-src --output-template-file printRpiTableHandlerOut.yaml
-      - aws cloudformation package --template-file printTeamTableHandler.yaml --s3-bucket nepreprpi-src --output-template-file printTeamTableHandlerOut.yaml
-      - aws cloudformation package --template-file addGameHandler.yaml --s3-bucket nepreprpi-src --output-template-file addGameHandlerOut.yaml
+      - aws cloudformation package --template-file printRpiTableHandler/printRpiTableHandler.yaml --s3-bucket nepreprpi-src --output-template-file printRpiTableHandler/printRpiTableHandlerOut.yaml
+      - aws cloudformation package --template-file printTeamTableHandler/printTeamTableHandler.yaml --s3-bucket nepreprpi-src --output-template-file printTeamTableHandler/printTeamTableHandlerOut.yaml
+      - aws cloudformation package --template-file addGameHandler/addGameHandler.yaml --s3-bucket nepreprpi-src --output-template-file addGameHandler/addGameHandlerOut.yaml
 
 artifacts:
   type: zip
   files:
-    - printRpiTableHandlerOut.yaml
-    - printTeamTableHandlerOut.yaml
-    - addGameHandlerOut.yaml
+    - printRpiTableHandler/printRpiTableHandlerOut.yaml
+    - printTeamTableHandlerOut/printTeamTableHandlerOut.yaml
+    - addGameHandlerOut/addGameHandlerOut.yaml
