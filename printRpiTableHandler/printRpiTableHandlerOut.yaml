@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Prints the RPI table output
+Resources:
+  printRpiTableHandler:
+    Properties:
+      CodeUri: s3://nepreprpi-src/0f81c1f8bb34b3aebc87e21e95dcf533
+      Description: Prints the RPI table output
+      Handler: lambda_function.printRpiTableHandler
+      MemorySize: 128
+      Role: arn:aws:iam::530317771161:role/service-role/RPITable
+      Runtime: python2.7
+      Timeout: 3
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31
