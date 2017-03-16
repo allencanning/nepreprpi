@@ -1,0 +1,11 @@
+---
+version: 0.1
+phases:
+  install:
+    commands:
+      - aws cloudformation package --template-file sam/printRpiTableHandler.yaml --s3-bucket nepreprpi-src --output-template-file printRpiTableHandlerOut.yaml
+
+artifacts:
+  type: zip
+  files:
+    - printRpiTableHandlerOut.yaml

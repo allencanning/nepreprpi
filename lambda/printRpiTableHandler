@@ -46,8 +46,9 @@ def getRecords(games,teams):
 
   # calculate winpct
   for team in teams:
-    record[team['name']]['winpct'] = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
-    print(team['name']+" "+str(record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])))
+    if team['name'] in record:
+      record[team['name']]['winpct'] = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
+      print(team['name']+" "+str(record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])))
     
   return record
 
@@ -95,15 +96,18 @@ def printRpiTableHandler (event, context):
   record = getRecords(games,teams)
   for team in teams:
       owpct = getOwpct(games,record,team['name'])
-      record[team['name']]['owpct'] = owpct
-      oowpct = getOOwpct(games,record,team)
-      record[team['name']]['oowpct'] = oowpct
-      record[team['name']]['rpi'] = (record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
+      if team['name'] in record:
+        record[team['name']]['owpct'] = owpct
+        oowpct = getOOwpct(games,record,team)
+        record[team['name']]['oowpct'] = oowpct
+        record[team['name']]['rpi'] = (record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
       
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
-  content = '<html><head>'+css+'</head><body><table border="1" width="60%"><caption>New England Preps Lacrosse RPI Rankings</caption><tr><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
+  content = '<html><head>'+css+'</head><body><table><caption>New England Preps Lacrosse RPI Rankings</caption>'
+  content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
+  rank = 1
   for team in sorted(record.iteritems(), key=lambda (x, y): y['rpi'], reverse=True):
-    content += '<tr><td><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?team='+team[0]+'">'+team[0]+'</a></td>'
+    content += '<tr><td>'+str(rank)+'</td><td><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?team='+team[0]+'">'+team[0]+'</a></td>'
     content += '<td>'+str(record[team[0]]['win'])+'</td>'
     content += '<td>'+str(record[team[0]]['loss'])+'</td>'
     content += "<td>%0.2f" % record[team[0]]['winpct']
@@ -117,7 +121,9 @@ def printRpiTableHandler (event, context):
     content += "<td>%0.2f" % rpi
     content += "</td>"
     content += "</tr>\n"
+    rank += 1
 
   content += '</table></body></html>'
   return content
+
 
