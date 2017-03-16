@@ -38,7 +38,7 @@ def printTeamTableHandler(event, context):
   team = event['team']
 
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
-  content = "<html><head>"+css+"</head><body><table width=\"60%\"><caption>"+team+" Results</caption>\n<tr><th>Team</th><th>Score</th><th>Opponent</th></th><th>Score</th><th>Date</th></tr>\n"
+  content = "<html><head>"+css+"</head><body><table><caption>"+team+" Results</caption>\n<tr><th>Team</th><th>Score</th><th>Opponent</th></th><th>Score</th><th>Date</th></tr>\n"
   print(teams)
   for game in sorted(games, key=lambda k: k['date'], reverse=True):
     if team == game['winner'] or team == game['loser']:
