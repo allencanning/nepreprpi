@@ -7,7 +7,6 @@ Resources:
     Properties:
       Handler: lambda_function.printTeamTableHandler
       Runtime: python2.7
-      CodeUri: lambda/printTeamTableHandler
       Description: Print team table
       MemorySize: 128
       Timeout: 3

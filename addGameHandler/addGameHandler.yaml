@@ -7,7 +7,6 @@ Resources:
     Properties:
       Handler: lambda_function.addGameHandler
       Runtime: python2.7
-      CodeUri: lambda/addGameHandler
       Description: Handler to add games
       MemorySize: 128
       Timeout: 3
