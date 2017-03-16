@@ -47,14 +47,21 @@ def printFormData(teams):
     content += '<option value="'+team['name']+'">'+team['name']+'</option>'
   content += '</select> '
   content += 'Score: <input type="text" size="2" maxlength="2" name="loser_score">'
-  game_date = datetime.strftime(datetime.today(),"%m/%d/%Y")
+  cur_month = datetime.strftime(datetime.today(),"%b")
+  cur_day = datetime.strftime(datetime.today(),"%d")
   content += '<p>Date: <select name="month">'
   for month in sorted(months):
-    content += '<option value="'+str(month)+'">'+months[month]
+    content += '<option value="'+str(month)
+    if month == cur_month:
+      content += ' selected'
+    content += '">'+months[month]
   content += '</select>'
   content += '<select name="day">'
   for day in range(1,32):
-    content += '<option value="'+str(day)+'">'+str(day)
+    content += '<option value="'+str(day)
+    if day == cur_day:
+      content += ' selected'
+    content += '">'+str(day)
   content += '</select> '
   year = datetime.strftime(datetime.today(),"%Y")
   content += year
