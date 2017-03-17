@@ -1,29 +1,108 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 
 import time
-import boto.dynamodb2
-from boto.dynamodb2.fields import HashKey, RangeKey, KeysOnlyIndex, GlobalAllIndex
-from boto.dynamodb2.table import Table
-from boto.dynamodb2.types import NUMBER
+import boto3
+from optparse import OptionParser
 
-# connect to region
-con = boto.dynamodb2.connect_to_region('us-east-1')
+parser = OptionParser()
+parser.add_option("-t","--table TABLENAME",dest="table",
+                  help="Enter Table Name-- REQUIRED")
+
+(options, args) = parser.parse_args()
+
+if not options.table:
+  parser.print_help()
+  exit(1)
+
+dynamodb = boto3.resource('dynamodb')
 
 # Create table
-nepreprpiboys = Table.create('nepreprpiboys', schema=[
-    HashKey('season', data_type=NUMBER),
-    RangeKey('teams'),
-  ], throughput={
-    'read' : 10,
-    'write' : 2,
-  }, global_indexes=[
-    GlobalAllIndex('WinnerLoserIndex', parts=[
-      HashKey('winner'),
-      RangeKey('loser'),
-    ],
-    throughput={
-      'read': 10,
-      'write': 2,
-    })
+nepreprpiboys = dynamodb.create_table(
+  TableName=options.table,
+  KeySchema=[
+    {
+      'AttributeName': 'season',
+      'KeyType': 'HASH'
+    },
+    {
+      'AttributeName': 'teams',
+      'KeyType': 'RANGE',
+    },
+  ], AttributeDefinitions=[
+    {
+      'AttributeName': 'season',
+      'AttributeType': 'N',
+    },
+    {
+      'AttributeName': 'teams',
+      'AttributeType': 'S',
+    },
+    {
+      'AttributeName': 'date',
+      'AttributeType': 'S',
+    },
+    {
+      'AttributeName': 'loser',
+      'AttributeType': 'S',
+    },
+    {
+      'AttributeName': 'scores',
+      'AttributeType': 'S',
+    },
+    {
+      'AttributeName': 'winne',
+      'AttributeType': 'S',
+    },
+   ],
+   ProvisionedThroughput={
+     'ReadCapacityUnits' : 10,
+     'WriteCapacityUnits' : 2,
+   }, GlobalSecondaryIndexes=[
+     { 
+      'IndexName': 'winner-loser-index',
+       'KeySchema': [
+         {
+           'AttributeName': 'winner',
+           'KeyType': 'HASH',
+         },
+         {
+           'AttributeName': 'loser',
+           'KeyType': 'RANGE',
+         }
+       ],
+       'Projection': {
+         'ProjectionType': 'ALL',
+              'NonKeyAttributes': [
+                  'string',
+              ]
+         },
+         'ProvisionedThroughput': {
+            'ReadCapacityUnits': 10,
+            'WriteCapacityUnits': 2
+         }
+     },
+     { 
+      'IndexName': 'teams-date-index',
+       'KeySchema': [
+         {
+           'AttributeName': 'teams',
+           'KeyType': 'HASH',
+         },
+         {
+           'AttributeName': 'date',
+           'KeyType': 'RANGE',
+         }
+       ],
+       'Projection': {
+         'ProjectionType': 'ALL',
+              'NonKeyAttributes': [
+                  'string',
+              ]
+         },
+         'ProvisionedThroughput': {
+            'ReadCapacityUnits': 10,
+            'WriteCapacityUnits': 2
+         }
+     },
   ],
 )

@@ -1,36 +1,64 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 
 import time
-import boto.dynamodb2
-from boto.dynamodb2.fields import HashKey, RangeKey, KeysOnlyIndex, GlobalAllIndex
-from boto.dynamodb2.table import Table
-from boto.dynamodb2.types import NUMBER
+import boto3
 import pprint
+from optparse import OptionParser
 
-pp = pprint.PrettyPrinter(indent=4)
+parser = OptionParser()
+parser.add_option("-t","--table TABLENAME",dest="table",
+                  help="Enter Table Name-- REQUIRED")
+
+(options, args) = parser.parse_args()
+
+if not options.table:
+  parser.print_help()
+  exit(1)
 
 # connect to region
-con = boto.dynamodb2.connect_to_region('us-east-1')
-
-#r=con.describe_table('nepreprpiteams')
-#if r and r['Table']['TableStatus'] == 'ACTIVE':
-#  nepreprpiteams = Table('nepreprpiteams')
-#  nepreprpiteams.delete()
+dynamodb = boto3.resource('dynamodb')
 
 # Create table
-nepreprpiteams = Table.create('nepreprpiteams', schema=[
-   HashKey('name')
-   ], throughput={
-     'read' : 10,
-     'write' : 2,
-   }, global_indexes=[
-     GlobalAllIndex('season-name-index', parts=[
-      HashKey('season', data_type=NUMBER),
-      RangeKey('name'),
+t = dynamodb.create_table(
+  TableName=options.table,
+  KeySchema=[
+    {
+      'AttributeName': 'name',
+      'KeyType': 'HASH'
+    },
+   ], AttributeDefinitions=[
+      {
+        'AttributeName': 'name',
+        'AttributeType': 'S',
+      },
+      {
+        'AttributeName': 'season',
+        'AttributeType': 'N',
+      },
    ],
-   throughput={
-    'read': 10,
-    'write': 2,
-   })
- ],
+   ProvisionedThroughput={
+     'ReadCapacityUnits' : 10,
+     'WriteCapacityUnits' : 2,
+   }, GlobalSecondaryIndexes=[
+     { 
+      'IndexName': 'season-name-index',
+       'KeySchema': [
+         {
+	   'AttributeName': 'season',
+           'KeyType': 'HASH',
+         },
+         {
+           'AttributeName': 'name',
+           'KeyType': 'RANGE',
+         }
+       ],
+       'Projection': {
+         'ProjectionType': 'ALL',
+         },
+         'ProvisionedThroughput': {
+            'ReadCapacityUnits': 10,
+            'WriteCapacityUnits': 2
+         }
+       },
+   ],
 )

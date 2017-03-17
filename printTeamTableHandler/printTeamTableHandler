@@ -7,9 +7,14 @@ from boto3.dynamodb.conditions import Key, Attr
 dynamodb = boto3.resource('dynamodb')
 
 ## Query DB and get all the teams
-def getTeams():
+def getTeams(gender):
   season=2017
-  t = dynamodb.Table('nepreprpiteams')
+  if gender == "female":
+    table_name = 'nepreprpigirlsteams'
+  elif gender == "male":
+    table_name = 'nepreprpiboysteams'
+
+  t = dynamodb.Table(table_name)
   teams = t.query(KeyConditionExpression=Key('season').eq(season),
                    IndexName='season-name-index',
   )
@@ -24,22 +29,31 @@ def getTeams():
   return record
 
 ## Query DB and get all the games
-def getGames():
+def getGames(gender):
   season=2017
-  g = dynamodb.Table('nepreprpiboys')
+  if gender == "female":
+    table_name = 'nepreprpigirls'
+  elif gender == "male":
+    table_name = 'nepreprpiboys'
+
+  g = dynamodb.Table(table_name)
   games = g.query(KeyConditionExpression=Key('season').eq(season))
 
   return games['Items']
 
 def printTeamTableHandler(event, context):
+  if 'gender' in event:
+    gender=event['gender']
+  else:
+    gender='boys'
 
-  games = getGames()
-  teams = getTeams()
+  games = getGames(gender)
+  teams = getTeams(gender)
+
   team = event['team']
 
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
   content = "<html><head>"+css+"</head><body><table><caption>"+team+" Results</caption>\n<tr><th>Team</th><th>Score</th><th>Opponent</th></th><th>Score</th><th>Date</th></tr>\n"
-  print(teams)
   for game in sorted(games, key=lambda k: k['date'], reverse=True):
     if team == game['winner'] or team == game['loser']:
       content += '<tr><td><a href="'+teams[game['winner']]['url']+'">'+game['winner']+'</td><td>'+str(game['scores']['winner'])+'</td><td><a href="'+teams[game['loser']]['url']+'">'+game['loser']+'</td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
