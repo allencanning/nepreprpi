@@ -11,16 +11,22 @@ dynamodb = boto3.resource('dynamodb')
 print('Loading function')
 
 ## Query DB and get all the teams
-def getTeams():
+def getTeams(gender):
   season=2017
-  t = dynamodb.Table('nepreprpiteams')
+  table_name=''
+  if gender == "female":
+    table_name = 'nepreprpigirlsteams'
+  elif gender == "male":
+    table_name = 'nepreprpiboysteams'
+
+  t = dynamodb.Table(table_name)
   teams = t.query(KeyConditionExpression=Key('season').eq(season),
                    IndexName='season-name-index',
   )
 
   return teams['Items']
 
-def printFormData(teams):
+def printFormData(gender,teams):
   months = { '01': 'Jan',
              '02': 'Feb',
              '03': 'Mar',
@@ -36,7 +42,13 @@ def printFormData(teams):
   }
   content = '<form name="process" onSubmit="return formCheck();" method="post" action="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/addGameHandler">'
   content += '<div class="header">Enter Game Results<p>Gender: <select name="gender">'
-  content += '<option value="male">Male<option value="female">Female</select>'
+  content += '<option value="male"'
+  if gender == "male":
+    content += ' selected'
+  content += '>Male<option value="female"'
+  if gender == "female":
+    content += ' selected'
+  content += '>Female</select>'
   content += '<p>Winner:<select name="winner">'
   content += '<option value="">'
   for team in teams:
@@ -79,21 +91,27 @@ def addGameHandler(event, context):
     action=event['action']
   else:
     action="Form"
+
+  # If we don't pass in a gender then set to male
+  if 'gender' in event:
+    gender=event['gender']
+  else:
+    gender='male'
   
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
   script = '<script type="text/javascript" src="https://s3.amazonaws.com/nepreprpi/neprepformcheck.js"></script>'
   content = "<html><head>"+css+script+"</head><body>"
 
-  teams = getTeams()
+  teams = getTeams(gender)
 
   if action == 'Process':
-    gender=event['gender']
     winner=event['winner']
     loser=event['loser']
     date=event['date']
     ws=event['winner_score']
     ls=event['loser_score']
     
+    table_name = ""
     if gender == "female":
       table_name = 'nepreprpigirls'
     elif gender == "male":
@@ -113,9 +131,9 @@ def addGameHandler(event, context):
     t = dynamodb.Table(table_name)
     t.put_item(Item=record)
     content += '<p>Successful addtion of game'
-    content += '<p><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/addGameHandler">Add Another Game</a>'
+    content += '<p><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/addGameHandler?gender='+gender+'">Add Another Game</a>'
   else:
-    content += printFormData(teams)
+    content += printFormData(gender,teams)
 
   content += "</body></html>"
   return content
