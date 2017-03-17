@@ -46,11 +46,7 @@ nepreprpiboys = dynamodb.create_table(
       'AttributeType': 'S',
     },
     {
-      'AttributeName': 'scores',
-      'AttributeType': 'S',
-    },
-    {
-      'AttributeName': 'winne',
+      'AttributeName': 'winner',
       'AttributeType': 'S',
     },
    ],
@@ -72,9 +68,6 @@ nepreprpiboys = dynamodb.create_table(
        ],
        'Projection': {
          'ProjectionType': 'ALL',
-              'NonKeyAttributes': [
-                  'string',
-              ]
          },
          'ProvisionedThroughput': {
             'ReadCapacityUnits': 10,
@@ -95,9 +88,6 @@ nepreprpiboys = dynamodb.create_table(
        ],
        'Projection': {
          'ProjectionType': 'ALL',
-              'NonKeyAttributes': [
-                  'string',
-              ]
          },
          'ProvisionedThroughput': {
             'ReadCapacityUnits': 10,
