@@ -1,0 +1,16 @@
+#!/usr/local/bin/python3
+
+import re
+from openpyxl import load_workbook
+
+wb = load_workbook('Prep_RPI.xlsx')
+
+for sheet in wb:
+  print(sheet.title)
+  for row in sheet.rows:
+    if row[0].value == "School Name":
+      continue
+    if row[2].value:
+      url = re.sub(r"=HYPERLINK\(\"","",row[2].value)
+      url = re.sub(r"\",.*$","",url)
+      print(url)
