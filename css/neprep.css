@@ -6,13 +6,28 @@ table, th, td {
   border: 1px solid #D2D3D5;
   border-collapse: collapse;
 }
+
+div.caption {
+  align: center;
+  text-align: center;
+  padding: 20px 0px;
+  width: 80%;
+  font: 18px arial, sans-serif;
+  font-weight: bold;
+  color: white;
+  background-color: #2A2929;
+}
+
 th, td {
   text-align: center;
 }
+
 th {
+  text-decoration: underline;
   background-color: #666666;
   color: white;
 }
+
 tr:hover {
   background-color: #f5f5f5;
 }

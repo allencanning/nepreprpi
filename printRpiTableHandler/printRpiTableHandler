@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import division
 
 import json
+from datetime import datetime
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
@@ -124,8 +125,11 @@ def printRpiTableHandler (event, context):
         record[team['name']]['oowpct'] = oowpct
         record[team['name']]['rpi'] = (record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
       
+  today = datetime.strftime(datetime.today(),"%b %d, %Y")
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
-  content = '<html><head>'+css+'</head><body><table><caption>New England Preps Lacrosse RPI Rankings</caption>'
+  content = '<html><head>'+css+'</head><body>'
+  content += '<div class="caption">New England Prep Lacrosse RPI Rankings as of '+today+'</div>'
+  content += '<table>'
   content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
   rank = 1
   for team in sorted(record.iteritems(), key=lambda (x, y): y['rpi'], reverse=True):
