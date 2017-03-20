@@ -75,7 +75,10 @@ def getOwpct(games,record,team):
       numteams += 1
       owpct += record[g['loser']]['winpct']
 
-  owpctavg = owpct / numteams
+  if numteams != 0:
+    owpctavg = owpct / numteams
+  else:
+    owpctavg = 0
   
   return owpctavg
 
@@ -92,7 +95,10 @@ def getOOwpct(games,record,team):
       owpct = getOwpct(games,record,g['loser'])
       oowpct += owpct
 
-  oowpctavg = oowpct / numteams
+  if numteams != 0:
+    oowpctavg = oowpct / numteams
+  else:
+    oowpctavg = 0
 
   return oowpctavg
 
