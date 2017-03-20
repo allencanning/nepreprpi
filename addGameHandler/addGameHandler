@@ -41,7 +41,12 @@ def printFormData(gender,teams):
              '12': 'Dec'
   }
   content = '<form name="process" onSubmit="return formCheck();" method="post" action="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/addGameHandler">'
-  content += '<div class="header">Enter Game Results">'
+  content += '<div class="header">Enter '
+  if gender == "male":
+    content += 'Male '
+  elif gender == "female":
+    content += 'Female '
+  content += 'Game Results">'
   content += '<p>Winner:<select name="winner">'
   content += '<option value="">'
   for team in teams:
