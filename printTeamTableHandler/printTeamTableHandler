@@ -60,7 +60,8 @@ def printTeamTableHandler(event, context):
   content += '<table><tr><th>Team</th><th>Score</th><th>Opponent</th></th><th>Score</th><th>Date</th></tr>\n'
   for game in sorted(games, key=lambda k: k['date'], reverse=True):
     if team == game['winner'] or team == game['loser']:
-      content += '<tr><td><a href="'+teams[game['winner']]['url']+'">'+game['winner']+'</td><td>'+str(game['scores']['winner'])+'</td><td><a href="'+teams[game['loser']]['url']+'">'+game['loser']+'</td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
+      content += '<tr><td><div class="icon"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div><a href="'+teams[game['winner']]['url']+'">'+game['winner']+'</td>'
+      content += '<td>'+str(game['scores']['winner'])+'</td><td><div class="icon"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div><a href="'+teams[game['loser']]['url']+'">'+game['loser']+'</td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
 
   content += '</table><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printRpiTableHandler?gender='+gender+'">Back</a></body></html>'
   return content
