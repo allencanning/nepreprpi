@@ -4,7 +4,7 @@ body {
 }
 
 table {
-  width: 80%;
+  width: 95%;
 }
 
 table, th, td {
@@ -21,7 +21,7 @@ table, th, td {
   float: left;
   width: 80%;
   margin-right: -10px;
-  margin-left: -20px;
+  margin-left: -10px;
   margin-top: 5px;
 }
 
@@ -29,7 +29,7 @@ div.caption {
   align: center;
   text-align: center;
   padding: 20px 0px;
-  width: 80%;
+  width: 95%;
   font: 18px arial, sans-serif;
   font-weight: bold;
   color: white;
