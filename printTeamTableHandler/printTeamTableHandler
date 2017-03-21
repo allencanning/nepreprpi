@@ -8,8 +8,8 @@ from boto3.dynamodb.conditions import Key, Attr
 dynamodb = boto3.resource('dynamodb')
 
 ## Query DB and get all the teams
-def getTeams(gender):
-  season=2017
+def getTeams(gender,season):
+  table_name=''
   if gender == "female":
     table_name = 'nepreprpigirlsteams'
   elif gender == "male":
@@ -30,38 +30,50 @@ def getTeams(gender):
   return record
 
 ## Query DB and get all the games
-def getGames(gender):
-  season=2017
+def getGames(gender,season):
+  table_name=''
   if gender == "female":
     table_name = 'nepreprpigirls'
   elif gender == "male":
     table_name = 'nepreprpiboys'
-
+    
   g = dynamodb.Table(table_name)
   games = g.query(KeyConditionExpression=Key('season').eq(season))
 
   return games['Items']
 
 def printTeamTableHandler(event, context):
+
+  if 'team' in event:
+    team = event['team']
+  else:
+    team = "Brooks"
+    
   if 'gender' in event:
     gender=event['gender']
   else:
-    gender='boys'
+    gender='male'
 
-  games = getGames(gender)
-  teams = getTeams(gender)
+  # Get the season if passed in
+  if 'season' in event:
+    season=event['season']
+  else:
+    season=int(datetime.strftime(datetime.today(),"%Y"))
 
-  team = event['team']
-
+  games = getGames(gender,season)
+  teams = getTeams(gender,season)
+  
   today = datetime.strftime(datetime.today(),"%b %d, %Y")
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
   content = "<html><head>"+css+"</head><body>"
   content += '<div class="caption">'+team+' Results as of '+today+'</div>'
   content += '<table><tr><th>Team</th><th>Score</th><th>Opponent</th></th><th>Score</th><th>Date</th></tr>\n'
+  print(teams)
   for game in sorted(games, key=lambda k: k['date'], reverse=True):
     if team == game['winner'] or team == game['loser']:
-      content += '<tr><td><div class="icon"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div><a href="'+teams[game['winner']]['url']+'">'+game['winner']+'</td>'
-      content += '<td>'+str(game['scores']['winner'])+'</td><td><div class="icon"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div><a href="'+teams[game['loser']]['url']+'">'+game['loser']+'</td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
+      content += '<tr><td><div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+game['winner']+'.png"></div>'
+      content += '<div class="right"><a href="'+teams[game['winner']]['url']+'">'+game['winner']+'</a></div></td><td>'+str(game['scores']['winner'])+'</td>'
+      content += '<td><div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+game['loser']+'.png"></div><div class="right"><a href="'+teams[game['loser']]['url']+'">'+game['loser']+'</a></div></td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
 
   content += '</table><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printRpiTableHandler?gender='+gender+'">Back</a></body></html>'
   return content

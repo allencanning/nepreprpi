@@ -1,3 +1,8 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
 table {
   width: 80%;
 }
@@ -5,6 +10,19 @@ table {
 table, th, td {
   border: 1px solid #D2D3D5;
   border-collapse: collapse;
+}
+
+.left {
+  float: left;
+  width: 20%;
+}
+
+.right {
+  float: left;
+  width: 80%;
+  margin-right: -10px;
+  margin-left: -20px;
+  margin-top: 5px;
 }
 
 div.caption {
@@ -18,15 +36,17 @@ div.caption {
   background-color: #2A2929;
 }
 
-icon {
+.icon {
+  align: left;
   width:25px;
   height:25px;
   display:inline-block;
-  margin:0 15px -7px 0
+  margin:0px 10px -15px 0px;
 }
 
 th, td {
   text-align: center;
+  vertical-align: center;
 }
 
 th {

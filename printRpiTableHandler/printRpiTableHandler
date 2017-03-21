@@ -73,7 +73,7 @@ def getOwpct(games,record,team):
     if team != g['loser']:
       numteams += 1
       owpct += record[g['loser']]['winpct']
-
+  
   if numteams != 0:
     owpctavg = owpct / numteams
   else:
@@ -102,7 +102,6 @@ def getOOwpct(games,record,team):
   return oowpctavg
 
 def printRpiTableHandler (event, context):
-  # get the gender if passed in
   if 'gender' in event:
     gender=event['gender']
   else:
@@ -129,23 +128,24 @@ def printRpiTableHandler (event, context):
         oowpct = getOOwpct(games,record,team)
         record[team['name']]['oowpct'] = oowpct
         record[team['name']]['rpi'] = (record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
-   
+
   # set the caption based on gender
   if gender == 'female':
     caption = 'Girls'
   elif gender == 'male':
-    caption = 'Boys'o
-
+    caption = 'Boys'
+    
   today = datetime.strftime(datetime.today(),"%b %d, %Y")
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
   content = '<html><head>'+css+'</head><body>'
-  content += '<div class="caption">New England Prep '+caption+' Lacrosse RPI Rankings as of '+today+'</div>'
+  content += '<div class="caption">New England Prep Lacrosse '+caption+' RPI Rankings as of '+today+'</div>'
   content += '<table>'
   content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
   rank = 1
   for team in sorted(record.iteritems(), key=lambda (x, y): y['rpi'], reverse=True):
     content += '<tr><td>'+str(rank)+'</td><td>'
-    content += '<div class="icon"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?gender='+gender+'&team='+team[0]+'">'+team[0]+'</a></td>'
+    content += '<div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div>'
+    content += '<div class="right"><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?gender='+gender+'&team='+team[0]+'">'+team[0]+'</a></div></td>'
     content += '<td>'+str(record[team[0]]['win'])+'</td>'
     content += '<td>'+str(record[team[0]]['loss'])+'</td>'
     content += "<td>%0.2f" % record[team[0]]['winpct']
