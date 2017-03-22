@@ -72,8 +72,8 @@ def printTeamTableHandler(event, context):
   for game in sorted(games, key=lambda k: k['date'], reverse=True):
     if team == game['winner'] or team == game['loser']:
       content += '<tr><td><div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+game['winner']+'.png"></div>'
-      content += '<div class="right"><a href="'+teams[game['winner']]['url']+'">'+game['winner']+'</a></div></td><td>'+str(game['scores']['winner'])+'</td>'
-      content += '<td><div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+game['loser']+'.png"></div><div class="right"><a href="'+teams[game['loser']]['url']+'">'+game['loser']+'</a></div></td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
+      content += '<div class="right"><a target="_blank" href="'+teams[game['winner']]['url']+'">'+game['winner']+'</a></div></td><td>'+str(game['scores']['winner'])+'</td>'
+      content += '<td><div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+game['loser']+'.png"></div><div class="right"><a target="_blank" href="'+teams[game['loser']]['url']+'">'+game['loser']+'</a></div></td><td>'+str(game['scores']['loser'])+'</td><td>'+game['date']+'</td></tr>\n'
 
   content += '</table><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printRpiTableHandler?gender='+gender+'">Back</a></body></html>'
   return content

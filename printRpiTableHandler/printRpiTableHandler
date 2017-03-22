@@ -59,13 +59,13 @@ def getRecords(games,teams):
   for team in teams:
     if team['name'] in record:
       record[team['name']]['winpct'] = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
-      print(team['name']+" "+str(record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])))
-    
+
   return record
 
 def getOwpct(games,record,team):
   numteams = 0
   owpct = 0
+  print("Team = "+team)
   for g in games:
     if team != g['winner']:
       numteams += 1
@@ -85,11 +85,14 @@ def getOOwpct(games,record,team):
   numteams = 0
   oowpct = 0
   for g in games:
+    print("Team ="+team)
     if team != g['winner']:
+      print("Winner = "+g['winner'])
       numteams += 1
       owpct = getOwpct(games,record,g['winner'])
       oowpct += owpct
     if team != g['loser']:
+      print("Loser = "+g['loser'])
       numteams += 1
       owpct = getOwpct(games,record,g['loser'])
       oowpct += owpct
@@ -105,7 +108,7 @@ def printRpiTableHandler (event, context):
   if 'gender' in event:
     gender=event['gender']
   else:
-    gender='boys'
+    gender='male'
 
   # Get the season if passed in
   if 'season' in event:
@@ -122,10 +125,10 @@ def printRpiTableHandler (event, context):
   # build record entries
   record = getRecords(games,teams)
   for team in teams:
-      owpct = getOwpct(games,record,team['name'])
       if team['name'] in record:
+        owpct = getOwpct(games,record,team['name'])
         record[team['name']]['owpct'] = owpct
-        oowpct = getOOwpct(games,record,team)
+        oowpct = getOOwpct(games,record,team['name'])
         record[team['name']]['oowpct'] = oowpct
         record[team['name']]['rpi'] = (record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
 
@@ -149,14 +152,12 @@ def printRpiTableHandler (event, context):
     content += '<td>'+str(record[team[0]]['win'])+'</td>'
     content += '<td>'+str(record[team[0]]['loss'])+'</td>'
     content += "<td>%0.2f" % record[team[0]]['winpct']
-    owpct = getOwpct(games,record,team[0])
-    content += "<td>%0.2f" % owpct
     content += "</td>"
-    oowpct = getOOwpct(games,record,team)
-    content += "<td>%0.2f" % oowpct
+    content += "<td>%0.2f" % record[team[0]]['owpct']
     content += "</td>"
-    rpi = (record[team[0]]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
-    content += "<td>%0.2f" % rpi
+    content += "<td>%0.2f" % record[team[0]]['oowpct']
+    content += "</td>"
+    content += "<td>%0.2f" % record[team[0]]['rpi']
     content += "</td>"
     content += "</tr>\n"
     rank += 1

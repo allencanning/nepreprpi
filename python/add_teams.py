@@ -20,6 +20,7 @@ def readRecords(sheet,infile):
       if row[2].value:
         url = re.sub(r"=HYPERLINK\(\"","",row[2].value)
         url = re.sub(r"\",.*$","",url)
+      print("Team="+row[0].value+" URL="+url)
       records.append({'name': row[0].value, 'season': int(row[1].value), 'url': url})
 
   return records
@@ -51,7 +52,7 @@ if not options.sheet:
 
 # Set the table from the options listed on the command line
 if not options.table:
-  table = "nepreprpiteams"
+  table = "nepreprpiboysteams"
 else:
   table = options.table
 
