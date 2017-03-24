@@ -1,0 +1,120 @@
+from __future__ import print_function
+from __future__ import division
+
+import time
+from datetime import datetime
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
+
+dynamodb = boto3.resource('dynamodb')
+
+print('Loading function')
+
+## Query DB and get all the games
+def getGames(gender,season):
+  table_name=''
+  if gender == "female":
+    table_name = 'nepreprpigirls'
+  elif gender == "male":
+    table_name = 'nepreprpiboys'
+    
+  g = dynamodb.Table(table_name)
+  games = g.query(KeyConditionExpression=Key('season').eq(season))
+
+  return games['Items']
+
+## Query DB and get all the teams
+def getTeams(gender):
+  season=2017
+  table_name=''
+  if gender == "female":
+    table_name = 'nepreprpigirlsteams'
+  elif gender == "male":
+    table_name = 'nepreprpiboysteams'
+
+  t = dynamodb.Table(table_name)
+  teams = t.query(KeyConditionExpression=Key('season').eq(season),
+                   IndexName='season-name-index',
+  )
+
+  return teams['Items']
+
+def printFormData(gender,games):
+  months = { '01': 'Jan',
+             '02': 'Feb',
+             '03': 'Mar',
+             '04': 'Apr',
+             '05': 'May',
+             '06': 'Jun',
+             '07': 'Jul',
+             '08': 'Aug',
+             '09': 'Sep',
+             '10': 'Oct',
+             '11': 'Nov',
+             '12': 'Dec'
+  }
+  content = '<form name="process" onSubmit="return deleteFormCheck();" method="post" action="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/deleteGameHandler">'
+  content += '<div class="header">Remove '
+  if gender == "male":
+    content += 'Male '
+  elif gender == "female":
+    content += 'Female '
+  content += 'Game Results">'
+  content += '<p>Game: <select name="teams">'
+  content += '<option value="">'
+  for game in games:
+    content += '<option value="'+game['teams']+'">Teams: '+game['teams']+' - '+game['scores']['winner']+' Loser: '+game['loser']+' - '+game['scores']['loser'] Date: '+game['date']</option>'
+  content += '</select> '
+  content += ': <input type="hidden" name="date" value="">'
+  content += '<input type="hidden" name="season" value="'+year+'">'
+  content += '<input type="hidden" name="gender" value="'+gender+'">'
+  content += '<p><input type="submit" name="Delete Game" value="Delete Game">'
+  content += '<input type="reset">'
+  content += '<input type="hidden" name="action" value="Process"></form>'
+  return content
+  
+def addGameHandler(event, context):
+  if 'action' in event:
+    action=event['action']
+  else:
+    action="Form"
+
+  # If we don't pass in a gender then set to male
+  if 'gender' in event:
+    gender=event['gender']
+  else:
+    gender='male'
+
+  # Get the season from the form
+  if 'season' in event:
+    season=event['season']
+  else:
+    season=int(datetime.strftime(datetime.today(),"%Y"))
+  
+  css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
+  script = '<script type="text/javascript" src="https://s3.amazonaws.com/nepreprpi/neprepformcheck.js"></script>'
+  content = "<html><head>"+css+script+"</head><body>"
+
+  if action == 'Process':
+    teams=event['teams']
+    date=event['date']
+    
+    table_name = ""
+    if gender == "female":
+      table_name = 'nepreprpigirls'
+    elif gender == "male":
+      table_name = 'nepreprpiboys'
+
+    t = dynamodb.Table(table_name)
+    t.delete_item(Key=record)
+
+    content += '<p>Successful removal of game'
+    content += '<p><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/deleteGameHandler?gender='+gender+'">Delete Another Game</a>'
+  else:
+    games = getGames(gender,season)
+
+    content += printFormData(gender,games)
+
+  content += "</body></html>"
+  return content
+

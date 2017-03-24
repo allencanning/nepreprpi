@@ -5,6 +5,10 @@ function isValidDate(m,d,y) {
             composedDate.getFullYear() == y;
 }
 
+function deleteFormCheck() {
+  
+}
+
 function formCheck() {
   var winner = document.forms['process']['winner'].value;
   var loser = document.forms['process']['loser'].value;
