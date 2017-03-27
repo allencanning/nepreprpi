@@ -1,18 +1,20 @@
 from __future__ import print_function
 from __future__ import division
 
-import time
+import os, time
 from datetime import datetime
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
+
+os.environ['TZ'] = 'US/Eastern'
+time.tzset()
 
 dynamodb = boto3.resource('dynamodb')
 
 print('Loading function')
 
 ## Query DB and get all the teams
-def getTeams(gender):
-  season=2017
+def getTeams(gender,season):
   table_name=''
   if gender == "female":
     table_name = 'nepreprpigirlsteams'
@@ -46,7 +48,7 @@ def printFormData(gender,teams):
     content += 'Male '
   elif gender == "female":
     content += 'Female '
-  content += 'Game Results">'
+  content += 'Game Results</div>'
   content += '<p>Winner:<select name="winner">'
   content += '<option value="">'
   for team in teams:
@@ -91,6 +93,11 @@ def addGameHandler(event, context):
   else:
     action="Form"
 
+  if 'season' in event:
+    season=event['season']
+  else:
+    season=int(datetime.strftime(datetime.today(),"%Y"))
+
   # If we don't pass in a gender then set to male
   if 'gender' in event:
     gender=event['gender']
@@ -101,7 +108,7 @@ def addGameHandler(event, context):
   script = '<script type="text/javascript" src="https://s3.amazonaws.com/nepreprpi/neprepformcheck.js"></script>'
   content = "<html><head>"+css+script+"</head><body>"
 
-  teams = getTeams(gender)
+  teams = getTeams(gender,season)
 
   if action == 'Process':
     winner=event['winner']
