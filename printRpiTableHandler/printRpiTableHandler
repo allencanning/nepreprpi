@@ -2,13 +2,18 @@ from __future__ import print_function
 from __future__ import division
 
 import json
+import os, time
 from datetime import datetime
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
+os.environ['TZ'] = 'US/Eastern'
+time.tzset()
+
 dynamodb = boto3.resource('dynamodb')
 
 print('Loading function')
+
 
 ## Query DB and get all the teams
 def getTeams(gender,season):
@@ -65,14 +70,14 @@ def getRecords(games,teams):
 def getOwpct(games,record,team):
   numteams = 0
   owpct = 0
-  print("Team = "+team)
   for g in games:
-    if team != g['winner']:
-      numteams += 1
-      owpct += record[g['winner']]['winpct']
-    if team != g['loser']:
-      numteams += 1
-      owpct += record[g['loser']]['winpct']
+    if team == g['winner'] or team == g['loser']:
+      if team != g['winner']:
+        numteams += 1
+        owpct += record[g['winner']]['winpct']
+      if team != g['loser']:
+        numteams += 1
+        owpct += record[g['loser']]['winpct']
   
   if numteams != 0:
     owpctavg = owpct / numteams
@@ -85,17 +90,15 @@ def getOOwpct(games,record,team):
   numteams = 0
   oowpct = 0
   for g in games:
-    print("Team ="+team)
-    if team != g['winner']:
-      print("Winner = "+g['winner'])
-      numteams += 1
-      owpct = getOwpct(games,record,g['winner'])
-      oowpct += owpct
-    if team != g['loser']:
-      print("Loser = "+g['loser'])
-      numteams += 1
-      owpct = getOwpct(games,record,g['loser'])
-      oowpct += owpct
+    if team == g['winner'] or team == g['loser']:
+      if team != g['winner']:
+        numteams += 1
+        owpct = getOwpct(games,record,g['winner'])
+        oowpct += owpct
+      if team != g['loser']:
+        numteams += 1
+        owpct = getOwpct(games,record,g['loser'])
+        oowpct += owpct
 
   if numteams != 0:
     oowpctavg = oowpct / numteams
@@ -109,7 +112,7 @@ def printRpiTableHandler (event, context):
     gender=event['gender']
   else:
     gender='male'
-
+  
   # Get the season if passed in
   if 'season' in event:
     season=event['season']

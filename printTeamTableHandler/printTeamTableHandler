@@ -1,9 +1,13 @@
 from __future__ import print_function
 from __future__ import division
 
+import os, time
 import boto3
 from datetime import datetime
 from boto3.dynamodb.conditions import Key, Attr
+
+os.environ['TZ'] = 'US/Eastern'
+time.tzset()
 
 dynamodb = boto3.resource('dynamodb')
 
