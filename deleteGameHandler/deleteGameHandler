@@ -60,12 +60,8 @@ def printFormData(gender,games):
   elif gender == "female":
     content += 'Female '
   content += 'Game Results">'
-  content += '<p>Game: <select name="teams">'
-  content += '<option value="">'
   for game in games:
-    content += '<option value="'+game['teams']+'">Teams: '+game['teams']+' - '+game['scores']['winner']+' Loser: '+game['loser']+' - '+game['scores']['loser'] Date: '+game['date']</option>'
-  content += '</select> '
-  content += ': <input type="hidden" name="date" value="">'
+    content += '<input type="radio" name="teams" value="'+game['teams']+'"><label for="'+game['teams']+'">Winner: '+game['winner']+' Score: '+game['scores']['winner']+' Loser: '+game['loser']+' Score: '+game['scores']['loser']+' Date: '+game['date']+'</label><br>'
   content += '<input type="hidden" name="season" value="'+year+'">'
   content += '<input type="hidden" name="gender" value="'+gender+'">'
   content += '<p><input type="submit" name="Delete Game" value="Delete Game">'
@@ -73,11 +69,17 @@ def printFormData(gender,games):
   content += '<input type="hidden" name="action" value="Process"></form>'
   return content
   
-def addGameHandler(event, context):
+def deleteGameHandler(event, context):
   if 'action' in event:
     action=event['action']
   else:
     action="Form"
+
+  # If we don't pass in a season then set to current
+  if 'season' in event:
+    season=event['season']
+  else:
+    season=int(datetime.strftime(datetime.today(),"%Y"))
 
   # If we don't pass in a gender then set to male
   if 'gender' in event:
@@ -85,19 +87,12 @@ def addGameHandler(event, context):
   else:
     gender='male'
 
-  # Get the season from the form
-  if 'season' in event:
-    season=event['season']
-  else:
-    season=int(datetime.strftime(datetime.today(),"%Y"))
-  
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
   script = '<script type="text/javascript" src="https://s3.amazonaws.com/nepreprpi/neprepformcheck.js"></script>'
   content = "<html><head>"+css+script+"</head><body>"
 
   if action == 'Process':
     teams=event['teams']
-    date=event['date']
     
     table_name = ""
     if gender == "female":
