@@ -3,6 +3,7 @@ from __future__ import division
 
 import json
 import os, time
+import urllib
 from datetime import datetime
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
@@ -151,7 +152,7 @@ def printRpiTableHandler (event, context):
   for team in sorted(record.iteritems(), key=lambda (x, y): y['rpi'], reverse=True):
     content += '<tr><td>'+str(rank)+'</td><td>'
     content += '<div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div>'
-    content += '<div class="right"><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?gender='+gender+'&team='+team[0]+'">'+team[0]+'</a></div></td>'
+    content += '<div class="right"><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?gender='+gender+'&team='+urllib.quote_plus(team[0])+'">'+team[0]+'</a></div></td>'
     content += '<td>'+str(record[team[0]]['win'])+'</td>'
     content += '<td>'+str(record[team[0]]['loss'])+'</td>'
     content += "<td>%0.2f" % record[team[0]]['winpct']
