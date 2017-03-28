@@ -20,6 +20,8 @@ parser.add_option( "-S","--winner_score",dest="ws",
 		  help="Enter winning score -- REQUIRED")
 parser.add_option( "-s","--loser_score",dest="ls",
 		  help="Enter losing score -- REQUIRED")
+parser.add_option( "-t","--table",dest="table",
+		  help="Enter Table -- REQUIRED")
 
 (options, args) = parser.parse_args()
 
@@ -48,6 +50,11 @@ if not options.date:
 else:
   date = options.date
 
+if not options.table:
+  table="adctesting"
+else:
+  table=options.table
+
 # create the record
 record = {}
 record['season'] = int(datetime.strftime(datetime.today(),"%Y"))
@@ -59,6 +66,6 @@ record['scores'] = {}
 record['scores']['winner'] = options.ws
 record['scores']['loser'] = options.ls
 
-t = Table('nepreprpiboys')
+t = Table(table)
 
 t.put_item(data=record)

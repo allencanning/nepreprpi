@@ -39,32 +39,20 @@ def getTeams(gender):
 
   return teams['Items']
 
-def printFormData(gender,games):
-  months = { '01': 'Jan',
-             '02': 'Feb',
-             '03': 'Mar',
-             '04': 'Apr',
-             '05': 'May',
-             '06': 'Jun',
-             '07': 'Jul',
-             '08': 'Aug',
-             '09': 'Sep',
-             '10': 'Oct',
-             '11': 'Nov',
-             '12': 'Dec'
-  }
+def printFormData(gender,games,season):
   content = '<form name="process" onSubmit="return deleteFormCheck();" method="post" action="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/deleteGameHandler">'
   content += '<div class="header">Remove '
   if gender == "male":
     content += 'Male '
   elif gender == "female":
     content += 'Female '
-  content += 'Game Results">'
+  content += 'Game Results'
+  content += "<p>Please select a game to remove:<br>"
   for game in games:
     content += '<input type="radio" name="teams" value="'+game['teams']+'"><label for="'+game['teams']+'">Winner: '+game['winner']+' Score: '+game['scores']['winner']+' Loser: '+game['loser']+' Score: '+game['scores']['loser']+' Date: '+game['date']+'</label><br>'
-  content += '<input type="hidden" name="season" value="'+year+'">'
+  content += '<input type="hidden" name="season" value="'+str(season)+'">'
   content += '<input type="hidden" name="gender" value="'+gender+'">'
-  content += '<p><input type="submit" name="Delete Game" value="Delete Game">'
+  content += '<p><input type="submit" name="Delete Game" value="Delete">'
   content += '<input type="reset">'
   content += '<input type="hidden" name="action" value="Process"></form>'
   return content
@@ -77,7 +65,7 @@ def deleteGameHandler(event, context):
 
   # If we don't pass in a season then set to current
   if 'season' in event:
-    season=event['season']
+    season=int(event['season'])
   else:
     season=int(datetime.strftime(datetime.today(),"%Y"))
 
@@ -98,18 +86,22 @@ def deleteGameHandler(event, context):
     if gender == "female":
       table_name = 'nepreprpigirls'
     elif gender == "male":
-      table_name = 'nepreprpiboys'
-
+      table_name = 'neprepripboys'
+    
     t = dynamodb.Table(table_name)
-    t.delete_item(Key=record)
+    t.delete_item(
+        Key={
+            'season': season,
+            'teams': teams,
+        },
+    )
 
     content += '<p>Successful removal of game'
     content += '<p><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/deleteGameHandler?gender='+gender+'">Delete Another Game</a>'
   else:
     games = getGames(gender,season)
 
-    content += printFormData(gender,games)
+    content += printFormData(gender,games,season)
 
   content += "</body></html>"
   return content
-
