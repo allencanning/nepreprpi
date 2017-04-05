@@ -7,6 +7,7 @@ Resources:
     Properties:
       Handler: lambda_function.printRpiTableHandler
       Runtime: python2.7
+      CodeUri: .
       Description: Prints the RPI table output
       MemorySize: 128
       Timeout: 3

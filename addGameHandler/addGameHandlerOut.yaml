@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Handler to add games
+Resources:
+  addGameHandler:
+    Properties:
+      CodeUri: s3://nepreprpi-src/9457b4a8a3df089df553943909ca7614
+      Description: Handler to add games
+      Handler: lambda_function.addGameHandler
+      MemorySize: 128
+      Role: arn:aws:iam::530317771161:role/RPITableWrite
+      Runtime: python2.7
+      Timeout: 3
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31
