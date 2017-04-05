@@ -1,4 +1,5 @@
 function isValidDate(m,d,y) {
+  m = m - 1;
   var composedDate = new Date(y, m, d);
   return composedDate.getDate() == d &&
             composedDate.getMonth() == m &&
