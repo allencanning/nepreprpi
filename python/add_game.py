@@ -2,10 +2,8 @@
 
 import time
 from datetime import datetime
-import boto.dynamodb2
-from boto.dynamodb2.fields import HashKey, RangeKey, KeysOnlyIndex, GlobalAllIndex
-from boto.dynamodb2.table import Table
-from boto.dynamodb2.types import NUMBER
+import boto3
+from boto3.dynamodb.conditions import Key,Attr
 from optparse import OptionParser
 
 
@@ -20,6 +18,8 @@ parser.add_option( "-S","--winner_score",dest="ws",
 		  help="Enter winning score -- REQUIRED")
 parser.add_option( "-s","--loser_score",dest="ls",
 		  help="Enter losing score -- REQUIRED")
+parser.add_option( "-g","--gender",dest="gender",
+		  help="Enter Gender -- REQUIRED")
 
 (options, args) = parser.parse_args()
 
@@ -48,6 +48,11 @@ if not options.date:
 else:
   date = options.date
 
+if not options.gender:
+  print "Please specify a gender."
+  parser.print_help()
+  exit(1)
+
 # create the record
 record = {}
 record['season'] = int(datetime.strftime(datetime.today(),"%Y"))
@@ -59,6 +64,12 @@ record['scores'] = {}
 record['scores']['winner'] = options.ws
 record['scores']['loser'] = options.ls
 
-t = Table('nepreprpiboys')
+table_name = ""
+if gender == "female":
+  table_name = 'nepreprpigirls'
+elif gender == "male":
+  table_name = 'nepreprpiboys'
 
-t.put_item(data=record)
+t = dynamodb.Table(table_name)
+
+t.put_item(Item=record)

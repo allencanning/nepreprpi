@@ -36,7 +36,7 @@ function formCheck() {
   }
 
   if (!isValidDate(month,day,year)) {
-    msg = msg + "\nYou must enter a valid date";
+    msg = msg + "\n"+month+"/"+day+"/"+year+"\nYou must enter a valid date";
   } else {
     document.forms['process']['date'].value = month+'/'+day+'/'+year;
   }
