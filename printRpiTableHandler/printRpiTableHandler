@@ -145,7 +145,7 @@ def printRpiTableHandler (event, context):
   today = datetime.strftime(datetime.today(),"%b %d, %Y")
   css = '<link rel="stylesheet" href="https://s3.amazonaws.com/nepreprpi/neprep.css" type="text/css" />'
   content = '<html><head>'+css+'</head><body>'
-  content += '<div class="caption">New England Prep Lacrosse '+caption+' RPI Rankings as of '+today+'</div>'
+  content += '<div class="caption">Prep Lacrosse '+caption+' RPI Rankings as of '+today+'</div>'
   content += '<table>'
   content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
   rank = 1

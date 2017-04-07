@@ -1,0 +1,10 @@
+#!/bin/bash
+
+aws cloudformation package \
+   --template-file printRpiTableHandler.yaml \
+   --output-template-file printRpiTableHandlerOut.yaml \
+   --s3-bucket nepreprpi-src
+
+aws cloudformation deploy \
+   --template-file printRpiTableHandlerOut.yaml \
+   --stack-name nepreprpi 

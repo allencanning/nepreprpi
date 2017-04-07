@@ -3,7 +3,7 @@ Description: Prints the RPI table output
 Resources:
   printRpiTableHandler:
     Properties:
-      CodeUri: s3://nepreprpi-src/0f81c1f8bb34b3aebc87e21e95dcf533
+      CodeUri: s3://nepreprpi-src/b25bd9066438c0706e59e6e2bc31803f
       Description: Prints the RPI table output
       Handler: lambda_function.printRpiTableHandler
       MemorySize: 128

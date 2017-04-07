@@ -1,0 +1,10 @@
+#!/bin/bash
+
+aws cloudformation package \
+   --template-file addGameHandler.yaml \
+   --output-template-file addGameHandlerOut.yaml \
+   --s3-bucket nepreprpi-src
+
+aws cloudformation deploy \
+   --template-file addGameHandlerOut.yaml \
+   --stack-name nepreprpi 

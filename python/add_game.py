@@ -71,5 +71,5 @@ elif gender == "male":
   table_name = 'nepreprpiboys'
 
 t = dynamodb.Table(table_name)
-
+t = Table(table)
 t.put_item(Item=record)
