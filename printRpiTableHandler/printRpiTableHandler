@@ -134,7 +134,7 @@ def printRpiTableHandler (event, context):
         record[team['name']]['owpct'] = owpct
         oowpct = getOOwpct(games,record,team['name'])
         record[team['name']]['oowpct'] = oowpct
-        record[team['name']]['rpi'] = (record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25)
+        record[team['name']]['rpi'] = round((record[team['name']]['winpct']*.25)+(owpct*.50)+(oowpct*.25),2)
 
   # set the caption based on gender
   if gender == 'female':
@@ -148,8 +148,12 @@ def printRpiTableHandler (event, context):
   content += '<div class="caption">Prep Lacrosse '+caption+' RPI Rankings as of '+today+'</div>'
   content += '<table>'
   content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
-  rank = 1
+  rank = 0
+  prevrpi = 0
   for team in sorted(record.iteritems(), key=lambda (x, y): y['rpi'], reverse=True):
+    if prevrpi != record[team[0]]['rpi']:
+      rank += 1
+    prevrpi = record[team[0]]['rpi']
     content += '<tr><td>'+str(rank)+'</td><td>'
     content += '<div class="left"><img height="25" width="25" src="https://s3.amazonaws.com/nepreprpi/icons/'+team[0]+'.png"></div>'
     content += '<div class="right"><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?gender='+gender+'&team='+urllib.quote_plus(team[0])+'">'+team[0]+'</a></div></td>'
@@ -164,7 +168,6 @@ def printRpiTableHandler (event, context):
     content += "<td>%0.2f" % record[team[0]]['rpi']
     content += "</td>"
     content += "</tr>\n"
-    rank += 1
 
   content += '</table></body></html>'
   return content
