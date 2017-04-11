@@ -168,6 +168,7 @@ def printRpiTableHandler (event, context):
     content += "<td>%0.2f" % record[team[0]]['rpi']
     content += "</td>"
     content += "</tr>\n"
+    print("Team = "+team[0]+"; RPI = "+str(record[team[0]]['rpi'])+"; Prev RPI = "+str(prevrpi)+"Rank = "+str(rank))
 
   content += '</table></body></html>'
   return content

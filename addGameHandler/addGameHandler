@@ -62,10 +62,10 @@ def printFormData(gender,teams):
   content += '</select> '
   content += 'Score: <input type="text" size="2" maxlength="2" name="loser_score">'
   cur_month = datetime.strftime(datetime.today(),"%m")
-  cur_day = datetime.strftime(datetime.today(),"%d")
+  cur_day = int(datetime.strftime(datetime.today(),"%d"))
   content += '<p>Date: <select name="month">'
   for month in sorted(months):
-    content += '<option value="'+str(month)+'"'
+    content += '<option value="'+str(int(month))+'"'
     if month == cur_month:
       content += ' selected'
     content += '>'+months[month]
@@ -73,7 +73,7 @@ def printFormData(gender,teams):
   content += '<select name="day">'
   for day in range(1,32):
     content += '<option value="'+str(day)+'"'
-    if str(day) == cur_day:
+    if day == cur_day:
       content += ' selected'
     content += '>'+str(day)
   content += '</select> '
@@ -143,4 +143,3 @@ def addGameHandler(event, context):
 
   content += "</body></html>"
   return content
-
