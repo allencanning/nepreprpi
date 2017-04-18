@@ -113,6 +113,14 @@ def printRpiTableHandler (event, context):
     gender=event['gender']
   else:
     gender='male'
+
+  display="full"
+  
+  if 'useragent' in event:
+    useragent=event['useragent']
+    if 'Mobi' in useragent:
+      display="mobi"
+    print("user agent = "+useragent)
   
   # Get the season if passed in
   if 'season' in event:
@@ -147,7 +155,10 @@ def printRpiTableHandler (event, context):
   content = '<html><head>'+css+'</head><body>'
   content += '<div class="caption">Prep Lacrosse '+caption+' RPI Rankings as of '+today+'</div>'
   content += '<table>'
-  content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th><th>OWPCT</th><th>OOWPCT</th><th>RPI</th></tr>'
+  content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th>'
+  if display == 'full':
+    content += '<th>OWPCT</th><th>OOWPCT</th>'
+  content += '<th>RPI</th></tr>'
   rank = 0
   prevrpi = 0
   for team in sorted(record.iteritems(), key=lambda (x, y): y['rpi'], reverse=True):
@@ -161,14 +172,15 @@ def printRpiTableHandler (event, context):
     content += '<td>'+str(record[team[0]]['loss'])+'</td>'
     content += "<td>%0.2f" % record[team[0]]['winpct']
     content += "</td>"
-    content += "<td>%0.2f" % record[team[0]]['owpct']
-    content += "</td>"
-    content += "<td>%0.2f" % record[team[0]]['oowpct']
-    content += "</td>"
+    if display == 'full':
+      content += "<td>%0.2f" % record[team[0]]['owpct']
+      content += "</td>"
+      content += "<td>%0.2f" % record[team[0]]['oowpct']
+      content += "</td>"
     content += "<td>%0.2f" % record[team[0]]['rpi']
     content += "</td>"
     content += "</tr>\n"
-    print("Team = "+team[0]+"; RPI = "+str(record[team[0]]['rpi'])+"; Prev RPI = "+str(prevrpi)+"Rank = "+str(rank))
+    #print("Team = "+team[0]+"; RPI = "+str(record[team[0]]['rpi'])+"; Prev RPI = "+str(prevrpi)+"Rank = "+str(rank))
 
   content += '</table></body></html>'
   return content
