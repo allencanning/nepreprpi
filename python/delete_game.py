@@ -1,64 +1,51 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 
 import time
 from datetime import datetime
-import boto.dynamodb2
-from boto.dynamodb2.fields import HashKey, RangeKey, KeysOnlyIndex, GlobalAllIndex
-from boto.dynamodb2.table import Table
-from boto.dynamodb2.types import NUMBER
+import boto3
+from boto3.dynamodb.conditions import Key,Attr
 from optparse import OptionParser
-
 
 parser = OptionParser()
 parser.add_option("-w","--winner",dest="winner",
                   help="Enter Winning Team Name -- REQUIRED")
 parser.add_option( "-l","--loser",dest="loser",
 		  help="Enter Losing Team Name -- REQUIRED")
-parser.add_option( "-d","--date",dest="date",
-		  help="Enter game date -- Defaults to today")
-parser.add_option( "-S","--winner_score",dest="ws",
-		  help="Enter winning score -- REQUIRED")
-parser.add_option( "-s","--loser_score",dest="ls",
-		  help="Enter losing score -- REQUIRED")
+parser.add_option( "-g","--gender",dest="gender",
+		  help="Enter gender -- REQUIRED")
+parser.add_option( "-y","--year",dest="year",
+		  help="Enter season -- Defaults to current")
 
 (options, args) = parser.parse_args()
 
 if not options.winner:
-  print "Please specify a winning team."
+  print("Please specify a winning team.")
   parser.print_help()
   exit(1)
 
 if not options.loser:
-  print "Please specify a losing team."
+  print("Please specify a losing team.")
   parser.print_help()
   exit(1)
 
-if not options.ls:
-  print "Please specify a losing score."
-  parser.print_help()
-  exit(1)
-
-if not options.ws:
-  print "Please specify a winning score."
-  parser.print_help()
-  exit(1)
-
-if not options.date:
-  date = datetime.strftime(datetime.today(),"%m/%d/%Y")
+if not options.year:
+  options.year = int(datetime.strftime(datetime.today(),"%Y"))
 else:
-  date = options.date
+  options.year = int(options.year)
 
-# create the record
-record = {}
-record['season'] = int(datetime.strftime(datetime.today(),"%Y"))
-record['teams'] = options.winner+options.loser
-record['winner'] = options.winner
-record['loser'] = options.loser
-record['date'] = date
-record['scores'] = {}
-record['scores']['winner'] = options.ws
-record['scores']['loser'] = options.ls
+dynamodb = boto3.resource('dynamodb')
 
-t = Table('nepreprpiboys')
+table_name = ""
+if options.gender == "female":
+  table_name = 'nepreprpigirls'
+elif options.gender == "male":
+  table_name = 'nepreprpiboys'
 
-t.put_item(data=record)
+t = dynamodb.Table(table_name)
+
+t.delete_item(
+  Key={
+    'season': options.year,
+    'teams': options.winner+options.loser
+  }
+)
