@@ -60,7 +60,7 @@ def getRecords(games,teams):
       record[game['loser']]['loss'] = 0
       record[game['loser']]['tie'] = 0
 
-    if game['tie']:
+    if 'tie' in game:
       record[game['winner']]['tie'] += 1
       record[game['loser']]['tie'] += 1
     else:
