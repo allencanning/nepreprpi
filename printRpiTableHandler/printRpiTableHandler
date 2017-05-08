@@ -53,18 +53,24 @@ def getRecords(games,teams):
       record[game['winner']] = {}
       record[game['winner']]['win'] = 0
       record[game['winner']]['loss'] = 0
+      record[game['winner']]['tie'] = 0
     if game['loser'] not in record:
       record[game['loser']] = {}
       record[game['loser']]['win'] = 0
       record[game['loser']]['loss'] = 0
+      record[game['loser']]['tie'] = 0
 
-    record[game['winner']]['win'] += 1
-    record[game['loser']]['loss'] += 1
+    if game['tie']:
+      record[game['winner']]['tie'] += 1
+      record[game['loser']]['tie'] += 1
+    else:
+      record[game['winner']]['win'] += 1
+      record[game['loser']]['loss'] += 1
 
   # calculate winpct
   for team in teams:
     if team['name'] in record:
-      record[team['name']]['winpct'] = record[team['name']]['win']/(record[team['name']]['win']+record[team['name']]['loss'])
+      record[team['name']]['winpct'] = (record[team['name']]['win']+(record[team['name']]['tie']*.5))/(record[team['name']]['win']+record[team['name']]['loss']+record[team['name']]['tie'])
 
   return record
 
@@ -155,7 +161,7 @@ def printRpiTableHandler (event, context):
   content = '<html><head>'+css+'</head><body>'
   content += '<div class="caption">Prep Lacrosse '+caption+' RPI Rankings as of '+today+'</div>'
   content += '<table>'
-  content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>WPCT</th>'
+  content += '<tr><th>Rank</th><th>Name</th><th>Wins</th><th>Loss</th><th>Tie</th><th>WPCT</th>'
   if display == 'full':
     content += '<th>OWPCT</th><th>OOWPCT</th>'
   content += '<th>RPI</th></tr>'
@@ -170,6 +176,7 @@ def printRpiTableHandler (event, context):
     content += '<div class="right"><a href="https://9pd8zvy326.execute-api.us-east-1.amazonaws.com/prod/printTeamTableHandler?gender='+gender+'&team='+urllib.quote_plus(team[0])+'">'+team[0]+'</a></div></td>'
     content += '<td>'+str(record[team[0]]['win'])+'</td>'
     content += '<td>'+str(record[team[0]]['loss'])+'</td>'
+    content += '<td>'+str(record[team[0]]['tie'])+'</td>'
     content += "<td>%0.2f" % record[team[0]]['winpct']
     content += "</td>"
     if display == 'full':

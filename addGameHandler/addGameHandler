@@ -63,6 +63,7 @@ def printFormData(gender,teams):
   content += 'Score: <input type="text" size="2" maxlength="2" name="loser_score">'
   cur_month = datetime.strftime(datetime.today(),"%m")
   cur_day = int(datetime.strftime(datetime.today(),"%d"))
+  content += '<p>Tie: <input type="checkbox" name="tie">'
   content += '<p>Date: <select name="month">'
   for month in sorted(months):
     content += '<option value="'+str(int(month))+'"'
@@ -116,6 +117,7 @@ def addGameHandler(event, context):
     date=event['date']
     ws=event['winner_score']
     ls=event['loser_score']
+    tie=event['tie']
     
     table_name = ""
     if gender == "female":
@@ -133,6 +135,7 @@ def addGameHandler(event, context):
     record['scores'] = {}
     record['scores']['winner'] = ws
     record['scores']['loser'] = ls
+    record['tie'] = tie
 
     t = dynamodb.Table(table_name)
     t.put_item(Item=record)
