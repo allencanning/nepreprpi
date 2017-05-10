@@ -117,7 +117,10 @@ def addGameHandler(event, context):
     date=event['date']
     ws=event['winner_score']
     ls=event['loser_score']
+  if 'tie' in event:
     tie=event['tie']
+  else:
+    tie=False
     
     table_name = ""
     if gender == "female":
