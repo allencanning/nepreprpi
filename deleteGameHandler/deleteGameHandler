@@ -15,12 +15,12 @@ print('Loading function')
 def getGames(gender,season):
   table_name=''
   if gender == "female":
-    table_name = 'nepreprpigirls'
+    table_name = 'nepreprpigirlsnew'
   elif gender == "male":
-    table_name = 'nepreprpiboys'
+    table_name = 'nepreprpiboysnew'
     
   g = dynamodb.Table(table_name)
-  games = g.query(KeyConditionExpression=Key('season').eq(season))
+  games = g.scan(FilterExpression=Attr('season').eq(season))
 
   return games['Items']
 
@@ -50,7 +50,7 @@ def printFormData(gender,games,season):
   content += 'Game Results'
   content += "<p>Please select a game to remove:<br>"
   for game in games:
-    content += '<input type="radio" name="teams" value="'+game['teams']+'"><label for="'+game['teams']+'">Winner: '+game['winner']+' Score: '+str(game['scores']['winner'])+' Loser: '+game['loser']+' Score: '+str(game['scores']['loser'])+' Date: '+game['date']+'</label><br>'
+    content += '<input type="radio" name="key" value="'+game['key']+'"><label for="'+game['key']+'">Winner: '+game['winner']+' Score: '+str(game['scores']['winner'])+' Loser: '+game['loser']+' Score: '+str(game['scores']['loser'])+' Date: '+game['date']+'</label><br>'
   content += '<input type="hidden" name="season" value="'+str(season)+'">'
   content += '<input type="hidden" name="gender" value="'+gender+'">'
   content += '<p><input type="submit" name="Delete Game" value="Delete">'
@@ -81,19 +81,18 @@ def deleteGameHandler(event, context):
   content = "<html><head>"+css+script+"</head><body>"
 
   if action == 'Process':
-    teams=event['teams']
+    key=event['key']
     
     table_name = ""
     if gender == "female":
-      table_name = 'nepreprpigirls'
+      table_name = 'nepreprpigirlsnew'
     elif gender == "male":
-      table_name = 'nepreprpiboys'
+      table_name = 'nepreprpiboysnew'
     
     t = dynamodb.Table(table_name)
     t.delete_item(
         Key={
-            'season': season,
-            'teams': teams,
+            'key': key,
         },
     )
 
@@ -106,5 +105,4 @@ def deleteGameHandler(event, context):
 
   content += "</body></html>"
   return content
-
 

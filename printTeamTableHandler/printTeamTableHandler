@@ -37,12 +37,12 @@ def getTeams(gender,season):
 def getGames(gender,season):
   table_name=''
   if gender == "female":
-    table_name = 'nepreprpigirls'
+    table_name = 'nepreprpigirlsnew'
   elif gender == "male":
     table_name = 'nepreprpiboys'
     
   g = dynamodb.Table(table_name)
-  games = g.query(KeyConditionExpression=Key('season').eq(season))
+  games = g.scan(FilterExpression=Attr('season').eq(season))
 
   return games['Items']
 

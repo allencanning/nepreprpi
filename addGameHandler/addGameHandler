@@ -117,21 +117,22 @@ def addGameHandler(event, context):
     date=event['date']
     ws=event['winner_score']
     ls=event['loser_score']
-  if 'tie' in event:
-    tie=event['tie']
-  else:
-    tie=False
+    if 'tie' in event:
+      tie=event['tie']
+    else:
+      tie=False
     
     table_name = ""
     if gender == "female":
-      table_name = 'nepreprpigirls'
+      table_name = 'nepreprpigirlsnew'
     elif gender == "male":
       table_name = 'nepreprpiboys'
 
     # create the record
     record = {}
+    record['key'] = int(datetime.strftime(datetime.today(),"%s"))
+    record['TeamsDate'] = winner+loser+date
     record['season'] = int(datetime.strftime(datetime.today(),"%Y"))
-    record['teams'] = winner+loser
     record['winner'] = winner
     record['loser'] = loser
     record['date'] = date
