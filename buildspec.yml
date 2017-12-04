@@ -3,7 +3,7 @@ version: 0.1
 phases:
   install:
     commands:
-      - aws cloudformation package --profile nejll --region us-west-2 --template-file printRpiTableHandler/printRpiTableHandler.yaml --s3-bucket nepreprpi-src --output-template-file printRpiTableHandler/printRpiTableHandlerOut.yaml
+      - aws cloudformation package --region us-west-2 --template-file printRpiTableHandler/printRpiTableHandler.yaml --s3-bucket nepreprpi-src --output-template-file printRpiTableHandler/printRpiTableHandlerOut.yaml
 
 artifacts:
   type: zip
