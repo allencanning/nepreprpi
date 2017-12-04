@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "functionName",
+    "ParameterValue": "deleteGameHandler"
+  },
+  {
+    "ParameterKey": "s3Bucket",
+    "ParameterValue": "nepreprpi-src"
+  },
+  {
+    "ParameterKey": "s3Key",
+    "ParameterValue": "deleteGameHandler.zip"
+  }
+]

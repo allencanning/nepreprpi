@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "functionName",
+    "ParameterValue": "addGameHandler"
+  },
+  {
+    "ParameterKey": "s3Bucket",
+    "ParameterValue": "nepreprpi-src"
+  },
+  {
+    "ParameterKey": "s3Key",
+    "ParameterValue": "addGameHandler.zip"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "functionName",
+    "ParameterValue": "printTeamTableHandler"
+  },
+  {
+    "ParameterKey": "s3Bucket",
+    "ParameterValue": "nepreprpi-src"
+  },
+  {
+    "ParameterKey": "s3Key",
+    "ParameterValue": "printTeamTableHandler.zip"
+  }
+]

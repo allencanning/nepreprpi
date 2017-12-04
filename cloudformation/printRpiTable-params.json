@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "functionName",
+    "ParameterValue": "printRpiTableHandler"
+  },
+  {
+    "ParameterKey": "s3Bucket",
+    "ParameterValue": "nepreprpi-src"
+  },
+  {
+    "ParameterKey": "s3Key",
+    "ParameterValue": "printRpiTableHandler.zip"
+  }
+]

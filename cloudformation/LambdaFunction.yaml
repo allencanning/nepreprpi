@@ -1,0 +1,38 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS Cloudformation stack for Lambda functions'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  functionName:
+    Type: String
+    Description: Enter the function name
+  s3Bucket:
+    Type: String
+    Description: S3 bucket name
+  s3Key:
+    Type: String
+    Description: S3 key name
+  roleName:
+    Type: String
+    Description: IAM role used
+Resources:
+  lambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref functionName
+      Handler: !Join ['', ['lambda_function.],!Ref functionName]]
+      Runtime: python2.7
+      Role: !Ref roleName
+      CodeUri: !Join ['',['s3://',!Ref s3Bucket,'/',!Ref s3Key]]
+      Timeout: 10
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            Path: /{resourceId}
+            Method: get
+        PostResource:
+          Type: Api
+          Properties:
+            Path: /{resourceId}
+            Method: post
